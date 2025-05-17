@@ -43,9 +43,13 @@ WHERE Gender = 'M'
 GROUP BY name
 ORDER BY TotalBirths DESC;
 ```
+<details>
+  <summary>📊 Show Results</summary>
+
 |    | name    | TotalBirths |
 |----|---------|-------------|
 | 1  | Michael |   1376418   |
+</details>
 
 ```sql
 -- for female names
@@ -55,9 +59,12 @@ WHERE Gender = 'F'
 GROUP BY name
 ORDER BY TotalBirths DESC;
 ```
+<details>
+  <summary>📊 Show Results</summary>
 |    | name    | TotalBirths |
 |----|---------|-------------|
 | 1  | Jessica |    863121   |
+</details>
 
 ```sql
 -- Example: Find the most popular names by year
@@ -76,6 +83,9 @@ FROM girlnames) as f
 WHERE rnk = 1
 ORDER BY YEAR ASC
 ```
+<details>
+  <summary>📊 Show Results</summary>
+
 | Year | Name     | Rank |
 |------|----------|------|
 | 1980 | Jennifer | 1    |
@@ -108,6 +118,7 @@ ORDER BY YEAR ASC
 | 2007 | Emily    | 1    |
 | 2008 | Emma     | 1    |
 | 2009 | Isabella | 1    |
+</details>
 
 ```sql
 -- M
@@ -127,6 +138,8 @@ ORDER BY YEAR ASC
 ```sql
 -- Results: Most Popular Male Names by Year (1980-2009)
 ```
+<details>
+  <summary>📊 Show Results</summary>
 | Year | Name    | Rank |
 |------|---------|------|
 | 1980 | Michael | 1    |
@@ -159,19 +172,15 @@ ORDER BY YEAR ASC
 | 2007 | Jacob   | 1    |
 | 2008 | Jacob   | 1    |
 | 2009 | Jacob   | 1    |
+</details>
+
 ## 📊 Output Format
 Results will be displayed in organized tables containing:
 - Baby name
-- Frequency count
 - Year of record
 - Gender
-- Additional relevant statistics
-
-## 🔄 Updating Data
-To update the analysis with new data:
-1. Update the CSV file with new records
-2. Re-import the data into your MySQL database
-3. Re-run the analysis queries
+- rank
+- Total births
 
 ## 📈 Sample Visualizations
 The query results can be visualized using various charts:
