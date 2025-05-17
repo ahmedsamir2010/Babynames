@@ -49,6 +49,7 @@ ORDER BY TotalBirths DESC;
 |    | name    | TotalBirths |
 |----|---------|-------------|
 | 1  | Michael |   1376418   |
+
 </details>
 
 ```sql
@@ -61,9 +62,11 @@ ORDER BY TotalBirths DESC;
 ```
 <details>
   <summary>📊 Show Results</summary>
+
 |    | name    | TotalBirths |
 |----|---------|-------------|
 | 1  | Jessica |    863121   |
+
 </details>
 
 ```sql
@@ -118,6 +121,7 @@ ORDER BY YEAR ASC
 | 2007 | Emily    | 1    |
 | 2008 | Emma     | 1    |
 | 2009 | Isabella | 1    |
+
 </details>
 
 ```sql
@@ -140,6 +144,7 @@ ORDER BY YEAR ASC
 ```
 <details>
   <summary>📊 Show Results</summary>
+
 | Year | Name    | Rank |
 |------|---------|------|
 | 1980 | Michael | 1    |
@@ -172,6 +177,7 @@ ORDER BY YEAR ASC
 | 2007 | Jacob   | 1    |
 | 2008 | Jacob   | 1    |
 | 2009 | Jacob   | 1    |
+
 </details>
 
 ## 📊 Output Format
