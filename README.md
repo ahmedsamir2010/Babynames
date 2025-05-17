@@ -139,9 +139,6 @@ FROM boyname ) as m
 where rnk = 1
 ORDER BY YEAR ASC
 ```
-```sql
--- Results: Most Popular Male Names by Year (1980-2009)
-```
 <details>
   <summary>📊 Show Results</summary>
 
