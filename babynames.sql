@@ -8,8 +8,8 @@ CREATE TABLE names (
     Births INT
 );
 
-ALTER TABLE names
-ALTER COLUMN Births INT NOT NULL;
+-- ALTER TABLE names
+-- ALTER COLUMN Births INT NOT NULL;
 
 -- find top names for F M
 -- F
@@ -37,7 +37,7 @@ GROUP BY YEAR, NAME
 SELECT * FROM (
 SELECT year,name,
     row_number() over (partition by year order by TotalBirths desc) as rnk
-FROM girlnames) as t
+FROM girlnames) as f
 WHERE rnk = 1
 ORDER BY YEAR ASC
 
@@ -48,11 +48,10 @@ SELECT YEAR, NAME, SUM(Births) AS TotalBirths
 FROM names
 WHERE Gender = 'M'
 GROUP BY YEAR, NAME
-ORDER BY YEAR ASC, TotalBirths DESC
 )
 SELECT * FROM (
 SELECT year,name,
     row_number() over (partition by year order by TotalBirths desc) as rnk
-FROM boyname ) as b
+FROM boyname ) as m
 where rnk = 1
-
+ORDER BY YEAR ASC
