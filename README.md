@@ -89,7 +89,7 @@ ORDER BY YEAR ASC
 <details>
   <summary>📊 Show Results</summary>
 
-| Year | Name     | Rank |
+| Year | Name     | rnk |
 |------|----------|------|
 | 1980 | Jennifer | 1    |
 | 1981 | Jennifer | 1    |
@@ -142,7 +142,7 @@ ORDER BY YEAR ASC
 <details>
   <summary>📊 Show Results</summary>
 
-| Year | Name    | Rank |
+| Year | Name    | rnk |
 |------|---------|------|
 | 1980 | Michael | 1    |
 | 1981 | Michael | 1    |
@@ -177,12 +177,142 @@ ORDER BY YEAR ASC
 
 </details>
 
+
+```sql
+-- Find the names with the biggest jumps in popularity from the first year of the data set to the last year
+USE Babynames;
+with allnames as (
+	SELECT YEAR, NAME, SUM(Births) AS TotalBirths
+	FROM names
+	GROUP BY YEAR, NAME
+),
+names1980 as (
+	SELECT year,name,
+		row_number() over (partition by year order by TotalBirths desc, name desc) as rnk
+	FROM allnames
+	WHERE YEAR = 1980
+),
+names2009 as (
+	SELECT year,name,
+		row_number() over (partition by year order by TotalBirths desc, name desc) as rnk
+	FROM allnames
+	WHERE YEAR = 2009
+)
+SELECT Top 3 t1.Name,t1.Year,t1.rnk,t2.Name,t2.Year,t2.rnk,
+       t1.rnk - t2.rnk AS diff
+FROM names1980 t1
+INNER JOIN names2009 t2 ON t1.NAME = t2.NAME
+ORDER BY diff desc;
+```
+<details>
+  <summary>📊 Show Results</summary>
+
+| Name   | Year | rnk | Name    | Year | rnk  | diff |
+|--------|------|-----|---------|------|------|------|
+| Aidan  | 1980 | 5780 | Aidan  | 2009 | 109  | 5671 |
+| Colton | 1980 | 5672 | Colton | 2009 | 149  | 5523 |
+| Aliyah | 1980 | 5770 | Aliyah | 2009 | 351  | 5419 |
+
+</details>
+
+```sql
+--For each year, return the 3 most popular girl names and 3 most popular boy names
+use Babynames;
+with babiesbyyear as (
+SELECT year,name, Gender,sum(Births) as totbirth from names
+group by year,name,gender
+),
+topnames as (
+	select YEAR , name, Gender ,
+			ROW_NUMBER() over(partition by year, Gender order by totbirth desc) as rnk
+	from babiesbyyear
+)
+select * from topnames
+where rnk <= 3
+```
+<details>
+  <summary>📊 Show Results</summary>
+
+| year | name        | Gender | rnk |
+|------|-------------|--------|------|
+| 1980 | Jennifer    | F      | 1    |
+| 1980 | Amanda      | F      | 2    |
+| 1980 | Jessica     | F      | 3    |
+| 1980 | Michael     | M      | 1    |
+| 1980 | Christopher | M      | 2    |
+| 1980 | Jason       | M      | 3    |
+<!-- ... abbreviated for readability ... -->
+| 2009 | Isabella    | F      | 1    |
+| 2009 | Emma        | F      | 2    |
+| 2009 | Olivia      | F      | 3    |
+| 2009 | Jacob       | M      | 1    |
+| 2009 | Ethan       | M      | 2    |
+| 2009 | Michael     | M      | 3    |
+
+Key Observations:
+- Michael dominated male names from 1980-1998
+- Jacob took over from 1999-2009
+- Female names showed more variety with Jennifer, Jessica, Ashley, and Emily taking turns as #1
+</details>
+
+```sql
+--For each decade, return the 3 most popular girl names and 3 most popular boy names
+use Babynames;
+with nameswithdecade as (
+SELECT case when year between 1980 and 1989 then 80
+			when year between 1990 and 1999 then 90
+			when year between 2000 and 2009 then 2000
+			else 'GZ' end as decade,
+name, Gender,Births from names
+),
+babiesbydecade as (
+SELECT decade,name,Gender,SUM(births) AS totbirth
+    FROM nameswithdecade
+    WHERE decade IS NOT NULL
+    GROUP BY decade, name, gender
+),
+topnames as (
+	select decade , name, Gender ,
+			ROW_NUMBER() over(partition by decade, Gender order by totbirth desc) as rnk
+	from babiesbydecade
+)
+select * from topnames
+where rnk <= 3
+```
+```sql
+// ...existing code...
+```
+<details>
+  <summary>📊 Show Results</summary>
+
+| decade | name        | Gender | rnk |
+|--------|-------------|--------|------|
+| 80     | Jessica     | F      | 1    |
+| 80     | Jennifer    | F      | 2    |
+| 80     | Amanda      | F      | 3    |
+| 80     | Michael     | M      | 1    |
+| 80     | Christopher | M      | 2    |
+| 80     | Matthew     | M      | 3    |
+| 90     | Jessica     | F      | 1    |
+| 90     | Ashley      | F      | 2    |
+| 90     | Emily       | F      | 3    |
+| 90     | Michael     | M      | 1    |
+| 90     | Christopher | M      | 2    |
+| 90     | Matthew     | M      | 3    |
+| 2000   | Emily       | F      | 1    |
+| 2000   | Madison     | F      | 2    |
+| 2000   | Emma        | F      | 3    |
+| 2000   | Jacob       | M      | 1    |
+| 2000   | Michael     | M      | 2    |
+| 2000   | Joshua      | M      | 3    |
+</details>
+
 ## 📊 Output Format
 Results will be displayed in organized tables containing:
 - Baby name
 - Year of record
 - Gender
-- rank
+- rnk
 - Total births
 
 ## 📈 Sample Visualizations
