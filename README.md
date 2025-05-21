@@ -241,7 +241,6 @@ where rnk <= 3
 | 1980 | Michael     | M      | 1    |
 | 1980 | Christopher | M      | 2    |
 | 1980 | Jason       | M      | 3    |
-<!-- ... abbreviated for readability ... -->
 | 2009 | Isabella    | F      | 1    |
 | 2009 | Emma        | F      | 2    |
 | 2009 | Olivia      | F      | 3    |
@@ -249,10 +248,6 @@ where rnk <= 3
 | 2009 | Ethan       | M      | 2    |
 | 2009 | Michael     | M      | 3    |
 
-Key Observations:
-- Michael dominated male names from 1980-1998
-- Jacob took over from 1999-2009
-- Female names showed more variety with Jennifer, Jessica, Ashley, and Emily taking turns as #1
 </details>
 
 ```sql
@@ -279,9 +274,6 @@ topnames as (
 select * from topnames
 where rnk <= 3
 ```
-```sql
-// ...existing code...
-```
 <details>
   <summary>📊 Show Results</summary>
 
@@ -305,6 +297,165 @@ where rnk <= 3
 | 2000   | Jacob       | M      | 1    |
 | 2000   | Michael     | M      | 2    |
 | 2000   | Joshua      | M      | 3    |
+</details>
+
+```sql
+-- Return the number of babies born in each of the six regions
+USE Babynames;
+--find miss / null / duplicated data
+select distinct n.State,cr.region from names n
+left join regions cr
+on n.State = cr.State
+-- MI is miss state
+--New England is duplicated ->> New_England
+```
+<details>
+  <summary>📊 Show Results</summary>
+
+  ## 📍 State and Region Distribution
+
+| State | Region       |
+|-------|-------------|
+| AK    | Pacific     |
+| AL    | South       |
+| AR    | South       |
+| AZ    | Mountain    |
+| CA    | Pacific     |
+| CO    | Mountain    |
+| CT    | New_England |
+| DC    | Mid_Atlantic|
+| DE    | South       |
+| FL    | South       |
+| GA    | South       |
+| HI    | Pacific     |
+| IA    | Midwest     |
+| ID    | Mountain    |
+| IL    | Midwest     |
+| IN    | Midwest     |
+| KS    | Midwest     |
+| KY    | South       |
+| LA    | South       |
+| MA    | New_England |
+| MD    | South       |
+| ME    | New_England |
+| MI    | NULL        |
+| MN    | Midwest     |
+| MO    | Midwest     |
+| MS    | South       |
+| MT    | Mountain    |
+| NC    | South       |
+| ND    | Midwest     |
+| NE    | Midwest     |
+| NH    | New England |
+| NJ    | Mid_Atlantic|
+| NM    | Mountain    |
+| NV    | Mountain    |
+| NY    | Mid_Atlantic|
+| OH    | Midwest     |
+| OK    | South       |
+| OR    | Pacific     |
+| PA    | Mid_Atlantic|
+| RI    | New_England |
+| SC    | South       |
+| SD    | Midwest     |
+| TN    | South       |
+| TX    | South       |
+| UT    | Mountain    |
+| VA    | South       |
+| VT    | New_England |
+| WA    | Pacific     |
+| WI    | Midwest     |
+| WV    | South       |
+| WY    | Mountain    |
+
+</details>
+
+
+```sql
+--clear data
+with clean_regin as (
+select state,
+		case when region = 'New England' then 'New_England' else region end as clean_regi
+from regions
+union
+select 'MI' as state, 'Midwest' as clean_regin
+)
+-- total births by regi
+select cr.clean_regi, sum(n.Births) as totBirths
+from names n left join clean_regin cr
+on n.State = cr.State
+group by clean_regi
+```
+<details>
+  <summary>📊 Show Results</summary>
+## 📊 Regional Birth Statistics
+
+| clean_regi   | totBirths |
+|--------------|-----------|
+| South        | 34,219,920|
+| Midwest      | 22,676,130|
+| Pacific      | 17,540,716|
+| Mid_Atlantic | 13,742,667|
+| Mountain     |  6,282,217|
+| New_England  |  4,269,213|
+
+</details>
+
+```sql
+-- top 3 rnk by regin
+select * from (
+	select cr.clean_regi,n.gender,n.name,
+	ROW_NUMBER() over(partition by clean_regi,n.gender order by sum(n.Births) desc) as rnk
+	from names n left join clean_regin cr
+	on n.State = cr.State
+	group by clean_regi,Gender,name
+	) as regrnk
+where rnk <=3
+```
+<details>
+  <summary>📊 Show Results</summary>
+
+## 📊 Top Names by Region and Gender
+
+| clean_regi  | Gender | Name        | rnk  |
+|-------------|--------|-------------|------|
+| Mid_Atlantic| F      | Jessica     | 1    |
+|             | F      | Ashley      | 2    |
+|             | F      | Jennifer    | 3    |
+|             | M      | Michael     | 1    |
+|             | M      | Matthew     | 2    |
+|             | M      | Christopher | 3    |
+| Midwest     | F      | Jessica     | 1    |
+|             | F      | Ashley      | 2    |
+|             | F      | Sarah       | 3    |
+|             | M      | Michael     | 1    |
+|             | M      | Matthew     | 2    |
+|             | M      | Joshua      | 3    |
+| Mountain    | F      | Jessica     | 1    |
+|             | F      | Ashley      | 2    |
+|             | F      | Sarah       | 3    |
+|             | M      | Michael     | 1    |
+|             | M      | Joshua      | 2    |
+|             | M      | Christopher | 3    |
+| New_England | F      | Jessica     | 1    |
+|             | F      | Sarah       | 2    |
+|             | F      | Emily       | 3    |
+|             | M      | Michael     | 1    |
+|             | M      | Matthew     | 2    |
+|             | M      | Christopher | 3    |
+| Pacific     | F      | Jessica     | 1    |
+|             | F      | Jennifer    | 2    |
+|             | F      | Ashley      | 3    |
+|             | M      | Michael     | 1    |
+|             | M      | Christopher | 2    |
+|             | M      | Daniel      | 3    |
+| South       | F      | Ashley      | 1    |
+|             | F      | Jessica     | 2    |
+|             | F      | Jennifer    | 3    |
+|             | M      | Christopher | 1    |
+|             | M      | Michael     | 2    |
+|             | M      | Joshua      | 3    |
+
 </details>
 
 ## 📊 Output Format

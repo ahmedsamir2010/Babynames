@@ -119,11 +119,14 @@ where rnk <= 3
 -- Return the number of babies born in each of the six regions
 
 USE Babynames;
---select distinct region from regions
+--find miss / null / duplicated data
+select distinct n.State,cr.region from names n
+left join regions cr
+on n.State = cr.State
+-- MI is miss state
+--New England is duplicated ->> New_England
 
---select 'MI' as mi, sum(Births) as tot from names
---where state = 'MI'
-
+--clear data
 with clean_regin as (
 select state,
 		case when region = 'New England' then 'New_England' else region end as clean_regi
