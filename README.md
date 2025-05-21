@@ -388,7 +388,6 @@ group by clean_regi
 ```
 <details>
   <summary>📊 Show Results</summary>
-## 📊 Regional Birth Statistics
 
 | clean_regi   | totBirths |
 |--------------|-----------|
@@ -457,6 +456,110 @@ where rnk <=3
 |             | M      | Joshua      | 3    |
 
 </details>
+
+```sql
+--Find the 10 most popular androgynous names (names given to both females and males)
+USE Babynames;
+with tbsex as (
+	select name,COUNT(distinct gender) as sex, sum(Births) as totbirths,
+	ROW_NUMBER() over(order by sum(Births) desc) as rnk
+	from names
+	group by name 
+)
+select TOP 10 * from tbsex
+where sex > 1
+order by totbirths desc
+```
+<details>
+  <summary>📊 Show Results</summary>
+
+## 📊 Most Popular Androgynous Names
+
+| Name        | sex | totbirths    | rnk |
+|-------------|-----|--------------|------|
+| Michael     | 2   | 1,382,856    | 1    |
+| Christopher | 2   | 1,122,213    | 2    |
+| Matthew     | 2   | 1,034,494    | 3    |
+| Joshua      | 2   | 960,170      | 4    |
+| Jessica     | 2   | 865,046      | 5    |
+| Daniel      | 2   | 824,208      | 6    |
+| David       | 2   | 819,479      | 7    |
+| Ashley      | 2   | 792,865      | 8    |
+| James       | 2   | 766,789      | 9    |
+| Andrew      | 2   | 761,824      | 10   |
+
+  </details>
+
+```sql
+--Find the length of the shortest and longest names, and identify the most popular short names (those with the fewest characters) and long names (those with the most characters)
+USE Babynames;
+select distinct name, LEN(name) as len  from names
+order by len desc, name desc
+
+USE Babynames;
+with lenrnk as (
+select * from names
+	where LEN(name) in(2,15)
+)
+select * from (
+select name, SUM(Births) as totbirths,
+ROW_NUMBER() over(partition by len(name) order by sum(Births) desc) as rnk
+from lenrnk
+group by name
+) as rnklen
+where rnk <= 3
+```
+<details>
+  <summary>📊 Show Results</summary>
+
+### Shortest Names (2 characters)
+| Name | totbirths   | rnk  |
+|------|-------------|------|
+| Ty   | 29,205      | 1    |
+| Bo   | 4,737       | 2    |
+| Jo   | 1,713       | 3    |
+
+### Longest Names (15 characters)
+| Name            | totbirths | rnk  |
+|-----------------|-----------|------|
+| Franciscojavier | 52        | 1    |
+| Ryanchristopher | 17        | 2    |
+| Mariadelosangel | 5         | 3    |
+
+  </details>
+
+```sql
+-- The founder of Maven Analytics is named Chris. Find the state with the lowest percent of babies named "Chris"
+
+
+USE Babynames;
+with rnkchis as (
+select State,name, SUM(Births) as totbirths 
+from names
+where name = 'Chris'
+group by state,name
+),
+allbabys as (
+select State, SUM(Births) as allbirths 
+from names
+group by state
+)
+select top 1 n.State,n.name,n.totbirths,
+a.allbirths,
+ cast(1.0 * n.totbirths / a.allbirths * 100  as decimal(5,4)) as perc
+from rnkchis n
+left join allbabys a on n.state = a.state
+order by perc asc
+-- WV
+```
+<details>
+  <summary>📊 Show Results</summary>
+
+| State | Name | totbirths | allbirths | perc   |
+|-------|------|-----------|-----------|--------|
+| WV    | Chris| 10        | 553,979   | 0.0018%|
+
+  </details>
 
 ## 📊 Output Format
 Results will be displayed in organized tables containing:

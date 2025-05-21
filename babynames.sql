@@ -149,3 +149,58 @@ select * from (
 	group by clean_regi,Gender,name
 	) as regrnk
 where rnk <=3
+
+
+--Find the 10 most popular androgynous names (names given to both females and males)
+USE Babynames;
+with tbsex as (
+	select name,COUNT(distinct gender) as sex, sum(Births) as totbirths,
+	ROW_NUMBER() over(order by sum(Births) desc) as rnk
+	from names
+	group by name 
+)
+select TOP 10 * from tbsex
+where sex > 1
+order by totbirths desc
+
+--Find the length of the shortest and longest names, and identify the most popular short names (those with the fewest characters) and long names (those with the most characters)
+USE Babynames;
+
+select distinct name, LEN(name) as len  from names
+order by len desc, name desc
+
+USE Babynames;
+with lenrnk as (
+select * from names
+	where LEN(name) in(2,15)
+)
+select * from (
+select name, SUM(Births) as totbirths,
+ROW_NUMBER() over(partition by len(name) order by sum(Births) desc) as rnk
+from lenrnk
+group by name
+) as rnklen
+where rnk <= 3
+
+-- The founder of Maven Analytics is named Chris. Find the state with the lowest percent of babies named "Chris"
+
+
+USE Babynames;
+with rnkchis as (
+select State,name, SUM(Births) as totbirths 
+from names
+where name = 'Chris'
+group by state,name
+),
+allbabys as (
+select State, SUM(Births) as allbirths 
+from names
+group by state
+)
+select top 1 n.State,n.name,n.totbirths,
+a.allbirths,
+ cast(1.0 * n.totbirths / a.allbirths * 100  as decimal(5,4)) as perc
+from rnkchis n
+left join allbabys a on n.state = a.state
+order by perc asc
+-- WV
