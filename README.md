@@ -21,7 +21,7 @@ This project provides a comprehensive analysis of US baby names data using SQL. 
 ### Installation Steps
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/us-baby-names-analysis.git
+git clone https://github.com/ahmedsamir2010/Babynames.git
 ```
 
 2. Open SQL Server and create a new database (Babynames)
